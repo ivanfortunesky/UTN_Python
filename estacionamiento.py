@@ -1,12 +1,13 @@
 import sqlite3
+import os
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, showerror
 
 
 # Función para conectar a l db
-def conectar():    
-    con = sqlite3.connect("estacionamiento.db")
+def conectar():   
+    con = sqlite3.connect("UTN_Python/estacionamiento.db")
     return con
 
 # Función para crear la tabla si no existe
