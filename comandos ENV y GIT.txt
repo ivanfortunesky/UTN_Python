@@ -1,0 +1,18 @@
+Dentro de UTN_Python
+
+python3 -m venv estacionamiento
+cd estacionamiento/Scripts/
+source activate
+Y se vé
+895@Ivan-PC MINGW64 /e/Python/UTN_Python/estacionamiento/Scripts (main)
+$ source activate
+(estacionamiento)
+*******************************
+(estacionamiento)
+895@Ivan-PC MINGW64 /e/Python/UTN_Python/estacionamiento/Scripts (main)
+$ deactivate
+895@Ivan-PC MINGW64 /e/Python/UTN_Python/estacionamiento/Scripts (main)
+
+*********************************
+Repo en GIT
+https://github.com/ivanfortunesky/UTN_Python.git
