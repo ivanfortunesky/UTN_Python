@@ -7,7 +7,8 @@ from tkinter.messagebox import showinfo, showerror
 
 # Función para conectar a l db
 def conectar():   
-    con = sqlite3.connect("UTN_Python/estacionamiento.db")
+    con = sqlite3.connect("UTN_Python/estacionamiento.db") #lo crea en la misma carpeta que el .py
+    #con = sqlite3.connect("estacionamiento.db") #lo manda a la carpeta raiz del proyecto
     return con
 
 # Función para crear la tabla si no existe
