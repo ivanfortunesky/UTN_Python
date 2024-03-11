@@ -1,5 +1,5 @@
 import sqlite3
-import os
+import re
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import showinfo, showerror
@@ -38,9 +38,9 @@ def modificar():
     #cochera.set(tree.item(selection[0], "values")[0])
 
     cochera_local = cochera.get()
-    patente_local  = patente.get()
-    nombre_local  = nombre.get()
-    telefono_local  = telefono.get()
+    patente_local  = validar_patente(patente.get())
+    nombre_local  = validar_nombre(nombre.get())
+    telefono_local  = validar_telefono(telefono.get())
  
         
     
@@ -77,21 +77,24 @@ def modificar():
 
 # Función para insertar un nuevo registro
 def insertar_registro():
+    
+    
     cochera_local = cochera.get()
-    patente_local  = patente.get()
-    nombre_local  = nombre.get()
-    telefono_local  = telefono.get()
+    patente_local  = validar_patente(patente.get())
+    #Validar con REGEX (nombre, telefono y patente)
+    nombre_local  = validar_nombre(nombre.get())
+    telefono_local  = validar_telefono(telefono.get())
     
     # Validar que todos los campos estén llenos
     if cochera_local == "" or patente_local == "" or nombre_local == "" or telefono_local == "":
         showerror("Error", "Por favor, complete todos los campos.")
-        return
+        return   
     
     # Validar que el teléfono contenga solo dígitos
-    if not telefono_local.isdigit():
+    """if not telefono_local.isdigit():
         showerror("Error", "El teléfono debe contener solo números.")
         return
-    
+    """
     # Conectar a la base de datos
     con = conectar()
     cursor = con.cursor()
@@ -121,10 +124,16 @@ def consultar():
     con = conectar()
     cursor = con.cursor()
     cursor.execute('''SELECT * FROM estacionamiento''') # traigo de la base estacionamiento TODO
-    for row in cursor.fetchall():
+    filas = cursor.fetchall()
+    con.close()
+    filas_ordenadas = sorted(filas, key=lambda x: x[1])
+    for fila in filas_ordenadas:
+        tree.insert("", "end", values=(fila[1], fila[2], fila[3], fila[4]))
+
+    """for row in cursor.fetchall():
         tree.insert("", "end", values=(row[1], row[2], row[3], row[4]))
     con.close()
-
+    """
 
 ##################################################
 # Función para updatear las campos cuando selecciono un item
@@ -132,11 +141,18 @@ def actualizar(evento):
     selection = tree.selection()
     if selection: 
         cochera_seleccionada = tree.item(selection[0], "values")[0]  
-        cochera.set(cochera_seleccionada)  # hago solo la cochera para ahorrarme pasos al modificar
-    patente.set("")
-    nombre.set("")
-    telefono.set("")
-
+        cochera.set(cochera_seleccionada)  # hago  la cochera para ahorrarme pasos al modificar
+    if selection: 
+        patente_seleccionada = tree.item(selection[0], "values")[1]  
+        patente.set(patente_seleccionada)  # hago  la patente para ahorrarme clicks al modificar
+    if selection: 
+        nombre_seleccionada = tree.item(selection[0], "values")[2]  
+        nombre.set(nombre_seleccionada)  # hago  el nombre para ahorrarme tipeo al modificar
+    if selection: 
+        telefono_seleccionada = tree.item(selection[0], "values")[3]  
+        telefono.set(telefono_seleccionada)  # hago  el nombre para ahorrarme tipeo al modificar
+   
+    
 ##################################################
     
 # Función para borrar una reserva
@@ -158,6 +174,37 @@ def borrar():
 
 # Crear tabla si no existe
 crear_tabla()
+
+
+##################################################
+#Función validar con Regex (Nombre solo alfanumerico y telefono solo dígitos sín espacios)
+
+def validar_nombre(expresion_a_validar):
+        nombre_regex = re.compile(r"^[A-Za-záéíóúñ]{2,}([\s][A-Za-záéíóúñ]{2,})+$", re.I)
+               
+        if nombre_regex.match(expresion_a_validar):
+            return expresion_a_validar.title()
+        else: 
+            showerror("Error", "Completar Nombre y Apellido, solo alfanumerico.")
+            return "<ERR formato Nom>"
+        
+def validar_telefono(expresion_a_validar):
+        
+        telefono_regex = re.compile(r"[0-9]{8,}$")
+        
+        if telefono_regex.match(expresion_a_validar):
+            return expresion_a_validar
+        else: 
+            showerror("Error", "Completar telefono completo, solo números.")
+            return "<ERR formato Tel>"
+def validar_patente(expresion_a_validar):
+        return expresion_a_validar.upper()
+        
+
+        
+#expresion_a_validar == nombre_regex | telefono_regex:
+##################################################   
+
 
 # Configuración de la ventana principal
 root = Tk()
@@ -194,4 +241,5 @@ tree.heading("Teléfono", text="Teléfono")
 tree.grid(row=7, column=0, columnspan=4)
 
 tree.bind("<<TreeviewSelect>>", actualizar)
+
 root.mainloop()
